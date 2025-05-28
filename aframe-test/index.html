@@ -10,6 +10,7 @@
   <script src="js/ar-shadows.js"></script>
   <script src="js/model-viewer.js"></script>
   <script src="js/background-gradient.js"></script>
+  <script src="https://unpkg.com/aframe-environment-component@1.3.x/dist/aframe-environment-component.min.js"></script>
 </head>
 <body>
 
@@ -17,8 +18,7 @@
   renderer="colorManagement: true;"
   info-message="htmlSrc: #messageText"
   model-viewer="gltfModel: #lfpomolecule; title: LFPO molecule"
-  xr-mode-ui="XRMode: xr"
-  environment="preset: contact; dressingAmount: 100;">
+  xr-mode-ui="XRMode: xr">
   <a-assets timeout="10000">
     <a-asset-item id="lfpomolecule"
       src="assets/models/LFPO.gltf"
@@ -27,6 +27,7 @@
     <img id="shadow" src="assets/images/shadow.png">
     <a-asset-item id="messageText" src="message.html"></a-asset-item>
   </a-assets>
+  <a-sky color="#361163"></a-sky>
 </a-scene>
 </body>
 </html>
