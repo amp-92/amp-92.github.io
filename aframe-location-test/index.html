@@ -68,11 +68,11 @@
       >
       </a-mixin>
     </a-assets>
-    <a-entity>
-      <a-camera></a-camera>
+    <a-entity id="rig" position="-1 0 5.4">
+      <a-camera position="0 1.4 0"></a-camera>
       <!-- Adding meta-touch-controls -->
-      <a-entity meta-touch-controls="hand: left"></a-entity>
-      <a-entity meta-touch-controls="hand: right"></a-entity>
+      <a-entity meta-touch-controls="hand: left" laser-controls="hand: left"></a-entity>
+      <a-entity meta-touch-controls="hand: right" laser-controles="hand: right"></a-entity>
       <!-- Attempt to add super-hands
       <a-entity sphere-collider="objects: a-box" super-hands hand-controls="hand: left"></a-entity>
       <a-entity sphere-collider="objects: a-box" super-hands hand-controls="hand: right"></a-entity>
