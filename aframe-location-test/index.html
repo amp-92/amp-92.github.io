@@ -70,10 +70,15 @@
     </a-assets>
     <a-entity>
       <a-camera></a-camera>
-      <!-- Old attempt to add superhands
+      <!-- Adding meta-touch-controls -->
+      <a-entity meta-touch-controls="hand: left"></a-entity>
+      <a-entity meta-touch-controls="hand: right"></a-entity>
+      <!-- Attempt to add super-hands
       <a-entity sphere-collider="objects: a-box" super-hands hand-controls="hand: left"></a-entity>
       <a-entity sphere-collider="objects: a-box" super-hands hand-controls="hand: right"></a-entity>
       -->
+
+      <!-- Attempt to add physics-hands
       <a-entity
                 id="rhand" mixin="physics-hands"
                 hand-controls="hand: right"
@@ -83,6 +88,7 @@
                 id="lhand" mixin="physics-hands"
                 hand-controls="hand: left"
       ></a-entity>
+      -->
     </a-entity>
     <a-entity
               static-body
@@ -92,13 +98,13 @@
               id="home-interior"
     ></a-entity>
     <a-box static-body width="100" height="0.01" depth="100" visible="false"></a-box>
-    <a-box
+    <a-entity
           dynamic-body
           class="cube"
           mixin="cube all-interactions"
           position="-0.21 0.265 -2.5"
           material="color: red"
-    ></a-box>
+    ></a-entity>
     <a-entity
               gltf-model="#lfpomolecule"
               position="-0.93059 1.00683 4.69307"
@@ -107,7 +113,7 @@
               id="lfpo-molecule"
               mixin="all-interactions"
     ></a-entity>
-    <a-box static-body class="cube" mixin="cube" position="-0.93358 0.40831 4.67315" material="color: red" id="table-collision" scale="2.4 0.8 0.9" visible="false"></a-box>
+    <a-entity static-body class="cube" mixin="cube" position="-0.93358 0.40831 4.67315" material="color: red" id="table-collision" scale="2.4 0.8 0.9" visible="false"></a-entity>
   </a-scene>
 </body>
 </html>
