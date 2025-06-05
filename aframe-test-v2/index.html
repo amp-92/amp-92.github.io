@@ -1,0 +1,156 @@
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Model Viewer AR - VR</title>
+  <meta name="description" content="Model Viewer (VR / AR) • A-Frame">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=100.0, user-scalable=yes" />
+  <!--<script src="aframe-master.js"></script> -->
+  <script src="https://aframe.io/releases/1.7.0/aframe.min.js"></script>
+  <script src="info-message.js"></script>
+  <script src="animation-mixer.js"></script>
+  <script src="ar-shadows.js"></script>
+  <script src="model-viewer-hacked.js"></script>
+  <script src="background-gradient.js"></script>
+  <script src="https://unpkg.com/aframe-environment-component@1.3.x/dist/aframe-environment-component.min.js"></script>
+  <script src="https://unpkg.com/aframe-terrain-model-component@1.0.1/dist/aframe-terrain-model-component.min.js"></script>
+</head>
+<body>
+
+<a-scene
+  renderer="colorManagement: false;"
+  info-message="htmlSrc: #messageText"
+  model-viewer="gltfModel: #lfpomolecule; title: LFPO molecule"
+  xr-mode-ui="XRMode: xr"
+
+  >
+  <!--
+  Environment attribute removed from a-scene:
+  environment="preset: contact; dressingAmount: 100;"
+  position="0 -1.6 0"
+  -->
+  <a-assets timeout="10000">
+    <a-asset-item id="lfpomolecule"
+      src="assets/models/LFPO.gltf"
+      response-type="arraybuffer"></a-asset-item>
+    <a-asset-item id="dragon"
+      src="assets/models/Dragon Rigged.glb"
+      response-type="arraybuffer"></a-asset-item>
+    <a-asset-item id="neilarmstrong"
+      src="assets/models/NeilArmstrong.glb"
+      response-type="arraybuffer"></a-asset-item>
+        <a-asset-item id="birdastronaut"
+      src="assets/models/Astronaut.glb"
+      response-type="arraybuffer"></a-asset-item>
+    
+
+
+    <img id="shadow" src="assets/images/shadow.png">
+    <a-asset-item id="messageText" src="message.html"></a-asset-item>
+    <a-asset-item id="realisticMountainTerrainModel" src="assets/models/uploads_files_3116838_Mountain.glb"></a-asset-item>
+    <a-asset-item id="lowPolyTerrainModel" src="assets/models/uploads_files_2843601_Terrain+2.glb"></a-asset-item>
+
+  </a-assets>
+  <!-- Dummy a-entity element used so model-viewer logic doesn't hijack the environment a-entity below -->
+  <a-entity id="dummy">
+  </a-entity>
+  <!-- A simple environment element to customise how the model is displayed. Delete this or comment it out to see a plain background -->
+  <a-entity id="contact-environment"
+            position="0 -1.5 0" 
+            scale="1 1 1"
+            environment="preset: contact;"
+            hide-on-enter-ar
+            >
+  </a-entity>
+  <a-entity
+            gltf-model="#neilarmstrong"
+            position="-1.4 -1.4 0"
+            rotation="0 45 0"
+            id="static-model-neil-armstrong">
+  </a-entity>
+    <a-entity
+            gltf-model="#dragon"
+            position="1.6 -1.4 -1"
+            rotation="0 318 0"
+            scale="0.2 0.2 0.2"
+            id="static-model-dragon">
+  </a-entity>
+    
+    <!-- Some unused sample environments I've tested out - swap them with the environment above to try them out!
+  <a-entity id="grassy-environment"
+            position="0 0 0" 
+            scale="2 2 2"
+            environment="preset: none;
+               dressingAmount: 100;
+               dressing: hexagons;
+               active: true;
+               dressingUniformScale: false;
+               flatShading: false;
+               grid: crosses;
+               ground: hills;
+               groundDensity: 10;
+               groundFrequency: 10;
+               groundTexture: walkernoise;
+               groundColor: #321;
+               groundColor2: #281;
+               dressingColor: #888;
+               groundYScale: 10;
+               lighting: distant;
+               skyType: atmosphere;
+               fog: 0.7;
+               dressingVariance: 1 1 1;
+               horizonColor: #fff"
+  >
+  </a-entity>
+  <a-entity id="a-very-lboro-environment"
+            position="0 -1.5 0" 
+            scale="1 1 1"
+            environment="preset: none;
+             dressingAmount: 100;
+             dressing: hexagons;
+             dressingUniformScale: false;
+             grid: crosses;
+             ground: hills;
+             groundDensity: 10;
+             groundFrequency: 10;
+             groundTexture: walkernoise;
+             groundColor: #361163;
+             groundColor2: #B70062;
+             dressingColor: #361163;
+             groundYScale: 10;
+             skyType: atmosphere;
+            >
+  </a-entity>
+
+  <a-entity id="a-different-environment"
+            position="0 -1.5 0" 
+            scale="1 1 1"
+            environment="dressingAmount:100;
+               dressing: hexagons;
+               dressingUniformScale: false;
+               grid:crosses;
+               ground:hills;
+               groundDensity:10;
+               groundFrequency:10;
+               groundTexture:walkernoise;
+               dressingColor:#361163;
+               groundYScale:10;"
+            >
+  </a-entity>
+    -->
+
+  <!--
+  <a-plane rotation="-90 0 0" color="#361163"></a-plane>
+  <a-sky color="#222"></a-sky>
+  
+    <a-plane 
+    position="0 -1 0" 
+    rotation="-90 0 0" 
+             width="10"
+             height="10"
+    color="#361163">
+  
+  </a-plane>
+-->
+</a-scene>
+</body>
+</html>
