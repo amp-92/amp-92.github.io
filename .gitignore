@@ -4,3 +4,4 @@ _site
 .jekyll-metadata
 vendor
 Gemfile.lock
+aframe-location-test/assets/.DS_Store
