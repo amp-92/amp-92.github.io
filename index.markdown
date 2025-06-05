@@ -11,4 +11,5 @@ This should just be a paragraph of text.
 1. [A-Frame model-viewer development](https://amp-92.github.io/aframe-test)
 2. [A different A-Frame model-viewer development](https://amp-92.github.io/aframe-test-v2)
     * This one uses other models and has been amended so that environments are supported properly.
-
+3. [A-Frame location test](https://amp-92.github.io/aframe-location-test)
+    * A scene that people can walk through (WASD controls supported, VR controls need testing). Set in an interior (gltf model) with an LFPO model that should be movable when looking in VR - uses [aframe-physics-system](https://github.com/n5ro/aframe-physics-system/tree/master) and [super-hands](https://github.com/c-frame/aframe-super-hands-component).
