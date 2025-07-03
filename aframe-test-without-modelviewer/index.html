@@ -21,6 +21,7 @@
                   laser-controls="hand: left"
                   raycaster="objects: #collisionbox; far: 5"
                   super-hands
+                  sphere-collider="objects: [grabbable]"
                   collision-filter="group: hands; collidesWith: objects"
                   two-hand-controls>
         </a-entity>
@@ -30,6 +31,7 @@
                   laser-controls="hand: right"
                   raycaster="objects: #collisionbox; far: 5"
                   super-hands
+                  sphere-collider="objects: [grabbable]"
                   collision-filter="group: hands; collidesWith: objects"
                   two-hand-controls>
         </a-entity>
@@ -42,7 +44,13 @@
                 stretchable
                 draggable
                 collision-filter="group: objects; collidesWith: hands">
-        <a-box id="collisionbox" width="3" height="1.8" depth="1.6" visible="false"></a-box>
+        <a-box id="collisionbox"
+               width="3"
+               height="1.8"
+               depth="1.6"
+               visible="false"
+               static-body>
+        </a-box>
         <a-entity id="lfpo"
                   gltf-model="#lfpomolecule"
                   scale="0.2 0.2 0.2"
@@ -56,7 +64,7 @@
             hide-on-enter-ar
             >
   </a-entity>
-  <a-entity light="type: directional; color: #EEE; intensity: 0.5" position="-1 0 0" rotation="90 0 -45"></a-entity>
+  <a-entity light="type: directional; color: #EEE; intensity: 0.5" position="-0.549 1.472 1.369"></a-entity>
 
       <a-assets>
         <a-asset-item id="lfpomolecule" src="assets/models/LFPO.gltf"></a-asset-item>
