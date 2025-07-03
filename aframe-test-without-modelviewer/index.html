@@ -51,6 +51,29 @@
       <a-assets>
         <a-asset-item id="lfpomolecule" src="assets/models/LFPO.gltf"></a-asset-item>
       </a-assets>
+      <!-- Grabber Component -->
+      <script>
+        AFRAME.registerComponent('grabber', {
+          init: function () {
+            const controller = this.el;
+
+            controller.addEventListener('triggerdown', () => {
+              const intersection = controller.components.raycaster.getIntersection(document.querySelector('.interactable'));
+              if (intersection) {
+                const target = intersection.object.el;
+                target.emit('grabbed-by', { hand: controller });
+              }
+            });
+
+            controller.addEventListener('triggerup', () => {
+              document.querySelectorAll('.interactable').forEach(target => {
+                target.emit('released-by', { hand: controller });
+              });
+            });
+          }
+        });
+      </script>
+      <!-- Two-Hand Grab Component -->
       <script>
         AFRAME.registerComponent('two-hand-grab', {
           init: function () {
