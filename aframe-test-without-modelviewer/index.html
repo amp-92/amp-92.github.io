@@ -16,40 +16,6 @@
       <a-entity id="cameraRig"
                 movement-controls="controls: gamepad,keyboard">
         <a-entity camera position="0 1.6 0" look-controls="pointerLockEnabled: true"></a-entity>
-          <!--
-          <a-entity id="leftHand"
-                    controller-controls="hand: left"
-                    raycaster="objects: .collidable; far: 5"
-                    super-hands="colliderEvent: raycaster-intersection; colliderEndEvent: raycaster-intersection-cleared"
-                    sphere-collider="objects: .grabbable"
-                    collision-filter="group: hands; collidesWith: objects"
-                    two-hand-controls>
-          </a-entity>
-          <a-entity id="rightHand"
-                    controller-controls="hand: right"
-                    raycaster="objects: .collidable; far: 5"
-                    super-hands="colliderEvent: raycaster-intersection; colliderEndEvent: raycaster-intersection-cleared"
-                    sphere-collider="objects: .grabbable"
-                    collision-filter="group: hands; collidesWith: objects"
-                    two-hand-controls>
-          </a-entity>
-          -->
-          <!--
-          <a-entity id="leftHand"
-                    raycaster="objects: .collidable; far: 5"
-                    hand-tracking-grab-controls="hand: left; hoverEnabled: true;"
-                    sphere-collider="objects: .grabbable"
-                    collision-filter="group: hands; collidesWith: objects"
-                    >
-          </a-entity>
-          <a-entity id="rightHand"
-                    hand-tracking-grab-controls="hand: right; hoverEnabled: true;"
-                    raycaster="objects: .collidable; far: 5"
-                    sphere-collider="objects: .grabbable"
-                    collision-filter="group: hands; collidesWith: objects"
-                    >
-          </a-entity>
-          -->
           <a-entity id="leftHand"
                     laser-controls="hand: left;"
                     raycaster="objects: .interactable; far: 10"
@@ -97,19 +63,26 @@
             controller.addEventListener('triggerdown', () => {
               const intersection = controller.components.raycaster.getIntersection(document.querySelector('.interactable'));
               if (intersection) {
-                grabbed = intersection.object.el;
-                controller.object3D.attach(grabbed.object3D);
-                controller.emit('grabbed-by', { hand: controller });
+                const target = intersection.object.el;
+                // Removed to make 2 hand controls work
+                /*controller.object3D.attach(grabbed.object3D);*/
+                target.emit('grabbed-by', { hand: controller });
               }
             });
 
             // On release, drop the object
             controller.addEventListener('triggerup', () => {
+              document.querySelectorAll('.interactable').forEach(target => {
+                target.emit('released-by', {hand: controller });
+              });
+              // Removed to try and fix 2 hand controls
+              /*
               if (grabbed) {
                 controller.sceneEl.object3D.attach(grabbed.object3D); // Reattach to world
                 grabbed = null;
                 controller.emit('released-by', { hand: controller });
               }
+              */
             });
           }
         });
