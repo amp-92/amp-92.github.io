@@ -33,15 +33,18 @@
       </a-entity>
 
       <!-- Grabbable Object -->
-      <a-entity id="lfpo"
-                gltf-model="#lfpomolecule"
-                position="0 1.5 -1"
-                scale="0.5 0.5 0.5"
-                geometry="primitive: box; width: 0.5; height: 0.5; depth: 0.5"
-                collision-filter="group: objects; collidesWith: hands"
+      <a-entity id="modelwrapper"
+                position="0 1.5 -3"
                 grabbable
                 stretchable
-                draggable>
+                draggable
+                collision-filter="group: objects; collidesWith: hands">
+        <a-box id="collisionbox" width="0.5" height="0.5" depth="0.5" visible="false"></a-box>
+        <a-entity id="lfpo"
+                  gltf-model="#lfpomolecule"
+                  scale="0.2 0.2 0.2"
+                  rotation="0 90 0">
+        </a-entity>        
       </a-entity>
 
       <a-assets>
