@@ -26,7 +26,6 @@
                     raycaster="objects: .interactable; far: 10"
                     grabber>
           </a-entity>
-
       </a-entity>
 
       <!-- Grabbable Object -->
@@ -41,97 +40,83 @@
                   draggable
                   two-hand-grab>
       </a-entity>
-        <a-entity id="contact-environment"
-            position="0 -1.5 0" 
-            scale="1 1 1"
-            environment="preset: contact;"
-            hide-on-enter-ar
-            >
-  </a-entity>
-  <a-entity light="type: directional; color: #EEE; intensity: 0.9" position="-0.549 1.472 1.369"></a-entity>
-
+      <a-entity id="contact-environment"
+          position="0 -1.5 0" 
+          scale="1 1 1"
+          environment="preset: contact;"
+          hide-on-enter-ar
+          >
+      </a-entity>
+      <a-entity light="type: directional; color: #EEE; intensity: 0.9" position="-0.549 1.472 1.369"></a-entity>
       <a-assets>
         <a-asset-item id="lfpomolecule" src="assets/models/LFPO.gltf"></a-asset-item>
       </a-assets>
       <script>
-        AFRAME.registerComponent('grabber', {
-          init: function () {
-            const controller = this.el;
-            let grabbed = null;
-
-            // When trigger is pressed, try to grab
-            controller.addEventListener('triggerdown', () => {
-              const intersection = controller.components.raycaster.getIntersection(document.querySelector('.interactable'));
-              if (intersection) {
-                const target = intersection.object.el;
-                // Removed to make 2 hand controls work
-                /*controller.object3D.attach(grabbed.object3D);*/
-                target.emit('grabbed-by', { hand: controller });
-              }
-            });
-
-            // On release, drop the object
-            controller.addEventListener('triggerup', () => {
-              document.querySelectorAll('.interactable').forEach(target => {
-                target.emit('released-by', {hand: controller });
-              });
-              // Removed to try and fix 2 hand controls
-              /*
-              if (grabbed) {
-                controller.sceneEl.object3D.attach(grabbed.object3D); // Reattach to world
-                grabbed = null;
-                controller.emit('released-by', { hand: controller });
-              }
-              */
-            });
-          }
-        });
-      </script>
-      <script>
         AFRAME.registerComponent('two-hand-grab', {
-          schema: {},
-
           init: function () {
-            this.grabbers = {};  // Store grabbing controllers
+            this.grabbers = {};
+            this.isTwoHanded = false;
+            this.activeGrabber = null;
             this.initialDistance = 0;
             this.initialScale = new THREE.Vector3();
             this.initialRotation = new THREE.Quaternion();
-            this.isTwoHanded = false;
-            this.tick = AFRAME.utils.throttleTick(this.tick.bind(this), 20); // Limit updates
+            this.tick = AFRAME.utils.throttleTick(this.tick.bind(this), 20);
+
             const el = this.el;
 
-            // Listen for custom grab events
             el.addEventListener('grabbed-by', evt => {
-              this.grabbers[evt.detail.hand.id] = evt.detail.hand;
-              if (Object.keys(this.grabbers).length === 2) {
+              const hand = evt.detail.hand;
+              this.grabbers[hand.id] = hand;
+
+              const grabCount = Object.keys(this.grabbers).length;
+
+              if (grabCount === 1) {
+                this.activeGrabber = hand;
+                // Attach to controller
+                hand.object3D.attach(el.object3D);
+              }
+
+              if (grabCount === 2) {
+                this.isTwoHanded = true;
+
                 const hands = Object.values(this.grabbers);
-                this.startTwoHandInteraction(hands[0], hands[1]);
+                const p1 = new THREE.Vector3();
+                const p2 = new THREE.Vector3();
+                hands[0].object3D.getWorldPosition(p1);
+                hands[1].object3D.getWorldPosition(p2);
+
+                // Detach from single controller
+                el.sceneEl.object3D.attach(el.object3D);
+
+                this.initialDistance = p1.distanceTo(p2);
+                el.object3D.getWorldScale(this.initialScale);
+                this.initialRotation.copy(el.object3D.quaternion);
               }
             });
 
             el.addEventListener('released-by', evt => {
-              delete this.grabbers[evt.detail.hand.id];
-              this.isTwoHanded = false;
+              const hand = evt.detail.hand;
+              delete this.grabbers[hand.id];
+
+              const remainingHands = Object.values(this.grabbers);
+              if (remainingHands.length === 1) {
+                this.activeGrabber = remainingHands[0];
+                // Reattach to remaining hand
+                this.activeGrabber.object3D.attach(el.object3D);
+                this.isTwoHanded = false;
+              } else {
+                this.activeGrabber = null;
+                this.isTwoHanded = false;
+              }
             });
-          },
-
-          startTwoHandInteraction(hand1, hand2) {
-            this.isTwoHanded = true;
-
-            const p1 = new THREE.Vector3();
-            const p2 = new THREE.Vector3();
-            hand1.object3D.getWorldPosition(p1);
-            hand2.object3D.getWorldPosition(p2);
-            this.initialDistance = p1.distanceTo(p2);
-
-            this.el.object3D.getWorldScale(this.initialScale);
-            this.initialRotation.copy(this.el.object3D.quaternion);
           },
 
           tick() {
             if (!this.isTwoHanded) return;
 
             const hands = Object.values(this.grabbers);
+            if (hands.length < 2) return;
+
             const [hand1, hand2] = hands;
 
             const p1 = new THREE.Vector3();
@@ -139,7 +124,7 @@
             hand1.object3D.getWorldPosition(p1);
             hand2.object3D.getWorldPosition(p2);
 
-            // --- Scale ---
+            // --- Scaling ---
             const currentDistance = p1.distanceTo(p2);
             const scaleFactor = currentDistance / this.initialDistance;
             this.el.object3D.scale.set(
@@ -152,7 +137,6 @@
             const dirVec = new THREE.Vector3().subVectors(p2, p1).normalize();
             const up = new THREE.Vector3(0, 1, 0);
             const newQuat = new THREE.Quaternion().setFromUnitVectors(up, dirVec);
-
             this.el.object3D.quaternion.copy(newQuat.multiply(this.initialRotation));
           }
         });
