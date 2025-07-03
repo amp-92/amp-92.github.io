@@ -51,37 +51,30 @@
           </a-entity>
           -->
           <a-entity id="leftHand"
-                    hand-controls="hand: left;"
-                    sphere-collider="objects: .grabbable"
-                    collision-filter="group: hands; collidesWith: objects"
-                    >
+                    laser-controls="hand: left;"
+                    raycaster="objects: .interactable; far: 10"
+                    grabber>
           </a-entity>
           <a-entity id="rightHand"
-                    hand-controls="hand: right;"
-                    raycaster="objects: .collidable; far: 5"
-                    sphere-collider="objects: .grabbable"
-                    collision-filter="group: hands; collidesWith: objects"
-                    >
+                    laser-controls="hand: right;"
+                    raycaster="objects: .interactable; far: 10"
+                    grabber>
           </a-entity>
 
       </a-entity>
 
       <!-- Grabbable Object -->
       <a-entity id="modelwrapper"
-                class="grabbable collidable"
+                class="interactable grabbable collidable"
                 position="0 1.5 -0.5"
                 grabbable
                 stretchable
-                draggable
-                collision-filter="group: objects; collidesWith: hands"
-                event-set__grabstart="_event: grab-start; scale: 0.3 0.3 0.3"
-                event-set__grabend="_event: grab-end; scale: 0.2 0.2 0.2">>
+                draggable>
         <a-box id="collisionbox"
                width="1"
                height="0.5"
                depth="0.3"
-               visible="false"
-               static-body>
+               visible="false">
         </a-box>
         <a-entity id="lfpo"
                   gltf-model="#lfpomolecule"
@@ -101,6 +94,31 @@
       <a-assets>
         <a-asset-item id="lfpomolecule" src="assets/models/LFPO.gltf"></a-asset-item>
       </a-assets>
+      <script>
+        AFRAME.registerComponent('grabber', {
+          init: function () {
+            const controller = this.el;
+            let grabbed = null;
+
+            // When trigger is pressed, try to grab
+            controller.addEventListener('triggerdown', () => {
+              const intersection = controller.components.raycaster.getIntersection(document.querySelector('.interactable'));
+              if (intersection) {
+                grabbed = intersection.object.el;
+                controller.object3D.attach(grabbed.object3D);
+              }
+            });
+
+            // On release, drop the object
+            controller.addEventListener('triggerup', () => {
+              if (grabbed) {
+                controller.sceneEl.object3D.attach(grabbed.object3D); // Reattach to world
+                grabbed = null;
+              }
+            });
+          }
+        });
+      </script>
     </a-scene>
   </body>
 </html>
