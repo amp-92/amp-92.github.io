@@ -18,20 +18,22 @@
 
         <!-- Left Controller -->
         <a-entity id="leftHand"
+                  controller-controls="hand: left"
                   hand-controls="hand: left"
-                  raycaster="objects: #collisionbox; far: 5"
+                  raycaster="objects: .collidable; far: 5"
                   super-hands="colliderEvent: raycaster-intersection; colliderEndEvent: raycaster-intersection-cleared"
-                  sphere-collider="objects: [grabbable]"
+                  sphere-collider="objects: .grabbable"
                   collision-filter="group: hands; collidesWith: objects"
                   two-hand-controls>
         </a-entity>
 
         <!-- Right Controller -->
         <a-entity id="rightHand"
+                  controller-controls="hand: right"
                   hand-controls="hand: right"
-                  raycaster="objects: #collisionbox; far: 5"
+                  raycaster="objects: .collidable; far: 5"
                   super-hands="colliderEvent: raycaster-intersection; colliderEndEvent: raycaster-intersection-cleared"
-                  sphere-collider="objects: [grabbable]"
+                  sphere-collider="objects: .grabbable"
                   collision-filter="group: hands; collidesWith: objects"
                   two-hand-controls>
         </a-entity>
@@ -39,11 +41,14 @@
 
       <!-- Grabbable Object -->
       <a-entity id="modelwrapper"
+                class="grabbable collidable"
                 position="0 1.5 -3"
                 grabbable
                 stretchable
                 draggable
-                collision-filter="group: objects; collidesWith: hands">
+                collision-filter="group: objects; collidesWith: hands"
+                event-set__grabstart="_event: grab-start; scale: 0.3 0.3 0.3"
+                event-set__grabend="_event: grab-end; scale: 0.2 0.2 0.2">>
         <a-box id="collisionbox"
                width="3"
                height="1.8"
