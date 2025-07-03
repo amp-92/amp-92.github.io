@@ -11,7 +11,7 @@
     <script src="https://unpkg.com/aframe-environment-component@1.3.x/dist/aframe-environment-component.min.js"></script>
   </head>
   <body>
-    <a-scene xr-mode-ui="XRMode: xr" webxr="optionalFeatures: hit-test, local-floor" obb-collider="showColliders: true">
+    <a-scene xr-mode-ui="XRMode: xr" webxr="optionalFeatures: hit-test, local-floor">
       <!-- Camera and Controllers -->
       <a-entity id="cameraRig"
                 movement-controls="controls: gamepad,keyboard">
@@ -54,7 +54,7 @@
       <!-- Grabbable Object -->
       <a-entity id="modelwrapper"
                 class="grabbable collidable"
-                position="0 1.5 -3"
+                position="0 1.5 -0.5"
                 grabbable
                 stretchable
                 draggable
@@ -62,15 +62,15 @@
                 event-set__grabstart="_event: grab-start; scale: 0.3 0.3 0.3"
                 event-set__grabend="_event: grab-end; scale: 0.2 0.2 0.2">>
         <a-box id="collisionbox"
-               width="3"
-               height="1.8"
-               depth="1.6"
+               width="1"
+               height="0.5"
+               depth="0.3"
                visible="false"
                static-body>
         </a-box>
         <a-entity id="lfpo"
                   gltf-model="#lfpomolecule"
-                  scale="0.2 0.2 0.2"
+                  scale="0.05 0.05 0.05"
                   rotation="0 90 0">
         </a-entity>        
       </a-entity>
