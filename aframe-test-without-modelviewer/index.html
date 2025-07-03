@@ -11,7 +11,7 @@
     <script src="https://unpkg.com/aframe-environment-component@1.3.x/dist/aframe-environment-component.min.js"></script>
   </head>
   <body>
-    <a-scene xr-mode-ui="XRMode: xr" webxr="optionalFeatures: hit-test, local-floor">
+    <a-scene xr-mode-ui="XRMode: xr" webxr="optionalFeatures: hit-test, local-floor" obb-collider="showColliders: true">
       <!-- Camera and Controllers -->
       <a-entity id="cameraRig"
                 movement-controls="controls: gamepad,keyboard">
@@ -64,23 +64,15 @@
       </a-entity>
 
       <!-- Grabbable Object -->
-      <a-entity id="modelwrapper"
-                class="interactable grabbable collidable"
-                position="0 1.5 -0.5"
-                grabbable
-                stretchable
-                draggable>
-        <a-box id="collisionbox"
-               width="1"
-               height="0.5"
-               depth="0.3"
-               visible="false">
-        </a-box>
-        <a-entity id="lfpo"
+      <a-entity id="lfpo"
+                  class="interactable grabbable collidable"
                   gltf-model="#lfpomolecule"
                   scale="0.05 0.05 0.05"
-                  rotation="0 90 0">
-        </a-entity>        
+                  position="0 1.2 -0.5"
+                  rotation="0 90 0"
+                  grabbable
+                  stretchable
+                  draggable>
       </a-entity>
         <a-entity id="contact-environment"
             position="0 -1.5 0" 
@@ -89,7 +81,7 @@
             hide-on-enter-ar
             >
   </a-entity>
-  <a-entity light="type: directional; color: #EEE; intensity: 0.5" position="-0.549 1.472 1.369"></a-entity>
+  <a-entity light="type: directional; color: #EEE; intensity: 0.9" position="-0.549 1.472 1.369"></a-entity>
 
       <a-assets>
         <a-asset-item id="lfpomolecule" src="assets/models/LFPO.gltf"></a-asset-item>
