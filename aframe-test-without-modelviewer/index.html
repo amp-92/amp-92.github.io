@@ -19,6 +19,7 @@
         <a-entity id="leftHand"
                   laser-controls="hand: left"
                   super-hands
+                  collision-filter="group: hands; collidesWith: objects"
                   two-hand-controls>
         </a-entity>
 
@@ -26,6 +27,7 @@
         <a-entity id="rightHand"
                   laser-controls="hand: right"
                   super-hands
+                  collision-filter="group: hands; collidesWith: objects"
                   two-hand-controls>
         </a-entity>
       </a-entity>
@@ -34,7 +36,9 @@
       <a-entity id="lfpo"
                 gltf-model="#lfpomolecule"
                 position="0 1.5 -1"
-                scale="1 1 1"
+                scale="0.5 0.5 0.5"
+                geometry="primitive: box; width: 0.5; height: 0.5; depth: 0.5"
+                collision-filter="group: objects; collidesWith: hands"
                 grabbable
                 stretchable
                 draggable>
