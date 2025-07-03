@@ -1,0 +1,48 @@
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>A-Frame AR - VR</title>
+    <meta name="description" content="A-Frame (VR / AR)">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=100.0, user-scalable=yes" />
+    <script src="https://aframe.io/releases/1.4.1/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/aframe-extras@6.1.1/dist/aframe-extras.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/super-hands@4.0.1/dist/super-hands.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/aframe-two-hand-controls/dist/aframe-two-hand-controls.min.js"></script>
+  </head>
+  <body>
+    <a-scene webxr="optionalFeatures: hit-test, local-floor">
+      <!-- Camera and Controllers -->
+      <a-entity id="cameraRig">
+        <a-entity camera position="0 1.6 0" look-controls></a-entity>
+
+        <!-- Left Controller -->
+        <a-entity id="leftHand"
+                  laser-controls="hand: left"
+                  super-hands
+                  two-hand-controls>
+        </a-entity>
+
+        <!-- Right Controller -->
+        <a-entity id="rightHand"
+                  laser-controls="hand: right"
+                  super-hands
+                  two-hand-controls>
+        </a-entity>
+      </a-entity>
+
+      <!-- Grabbable Object -->
+      <a-entity id="lfpo"
+                gltf-model="lfpomolecule"
+                position="0 1.5 -1"
+                scale="1 1 1"
+                grabbable
+                stretchable
+                draggable>
+      </a-entity>
+
+      <a-assets>
+        <a-asset-item id="lfpomolecule" src="assets/models/LFPO.gltf"></a-asset-item>
+      </a-assets>
+    </a-scene>
+  </body>
+</html>
