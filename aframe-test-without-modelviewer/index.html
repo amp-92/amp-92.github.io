@@ -34,19 +34,34 @@
                     two-hand-controls>
           </a-entity>
           -->
+          <!--
           <a-entity id="leftHand"
                     raycaster="objects: .collidable; far: 5"
                     hand-tracking-grab-controls="hand: left; hoverEnabled: true;"
                     sphere-collider="objects: .grabbable"
                     collision-filter="group: hands; collidesWith: objects"
-                    two-hand-controls>
+                    >
           </a-entity>
           <a-entity id="rightHand"
                     hand-tracking-grab-controls="hand: right; hoverEnabled: true;"
                     raycaster="objects: .collidable; far: 5"
                     sphere-collider="objects: .grabbable"
                     collision-filter="group: hands; collidesWith: objects"
-                    two-hand-controls>
+                    >
+          </a-entity>
+          -->
+          <a-entity id="leftHand"
+                    hand-controls="hand: left;"
+                    sphere-collider="objects: .grabbable"
+                    collision-filter="group: hands; collidesWith: objects"
+                    >
+          </a-entity>
+          <a-entity id="rightHand"
+                    hand-controls="hand: right;"
+                    raycaster="objects: .collidable; far: 5"
+                    sphere-collider="objects: .grabbable"
+                    collision-filter="group: hands; collidesWith: objects"
+                    >
           </a-entity>
 
       </a-entity>
