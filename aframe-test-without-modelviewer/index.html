@@ -10,7 +10,7 @@
     <script src="https://cdn.jsdelivr.net/npm/aframe-two-hand-controls/dist/aframe-two-hand-controls.min.js"></script>
   </head>
   <body>
-    <a-scene webxr="optionalFeatures: hit-test, local-floor">
+    <a-scene xr-mode-ui="XRMode: xr" webxr="optionalFeatures: hit-test, local-floor">
       <!-- Camera and Controllers -->
       <a-entity id="cameraRig">
         <a-entity camera position="0 1.6 0" look-controls></a-entity>
@@ -32,7 +32,7 @@
 
       <!-- Grabbable Object -->
       <a-entity id="lfpo"
-                gltf-model="lfpomolecule"
+                gltf-model="#lfpomolecule"
                 position="0 1.5 -1"
                 scale="1 1 1"
                 grabbable
