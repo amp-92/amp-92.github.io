@@ -18,9 +18,9 @@
 
         <!-- Left Controller -->
         <a-entity id="leftHand"
-                  laser-controls="hand: left"
+                  hand-controls="hand: left"
                   raycaster="objects: #collisionbox; far: 5"
-                  super-hands
+                  super-hands="colliderEvent: raycaster-intersection; colliderEndEvent: raycaster-intersection-cleared"
                   sphere-collider="objects: [grabbable]"
                   collision-filter="group: hands; collidesWith: objects"
                   two-hand-controls>
@@ -28,9 +28,9 @@
 
         <!-- Right Controller -->
         <a-entity id="rightHand"
-                  laser-controls="hand: right"
+                  hand-controls="hand: right"
                   raycaster="objects: #collisionbox; far: 5"
-                  super-hands
+                  super-hands="colliderEvent: raycaster-intersection; colliderEndEvent: raycaster-intersection-cleared"
                   sphere-collider="objects: [grabbable]"
                   collision-filter="group: hands; collidesWith: objects"
                   two-hand-controls>
