@@ -11,7 +11,7 @@
     <script src="https://unpkg.com/aframe-environment-component@1.3.x/dist/aframe-environment-component.min.js"></script>
   </head>
   <body>
-    <a-scene xr-mode-ui="XRMode: xr" webxr="optionalFeatures: hit-test, local-floor" obb-collider="showColliders: true">
+    <a-scene xr-mode-ui="XRMode: xr" webxr="optionalFeatures: hit-test, local-floor">
       <!-- Camera and Controllers -->
       <a-entity id="cameraRig"
                 movement-controls="controls: gamepad,keyboard">
@@ -72,7 +72,8 @@
                   rotation="0 90 0"
                   grabbable
                   stretchable
-                  draggable>
+                  draggable
+                  two-hand-grab>
       </a-entity>
         <a-entity id="contact-environment"
             position="0 -1.5 0" 
@@ -98,6 +99,7 @@
               if (intersection) {
                 grabbed = intersection.object.el;
                 controller.object3D.attach(grabbed.object3D);
+                controller.emit('grabbed-by', { hand: controller });
               }
             });
 
@@ -106,8 +108,79 @@
               if (grabbed) {
                 controller.sceneEl.object3D.attach(grabbed.object3D); // Reattach to world
                 grabbed = null;
+                controller.emit('released-by', { hand: controller });
               }
             });
+          }
+        });
+      </script>
+      <script>
+        AFRAME.registerComponent('two-hand-grab', {
+          schema: {},
+
+          init: function () {
+            this.grabbers = {};  // Store grabbing controllers
+            this.initialDistance = 0;
+            this.initialScale = new THREE.Vector3();
+            this.initialRotation = new THREE.Quaternion();
+            this.isTwoHanded = false;
+            this.tick = AFRAME.utils.throttleTick(this.tick.bind(this), 20); // Limit updates
+            const el = this.el;
+
+            // Listen for custom grab events
+            el.addEventListener('grabbed-by', evt => {
+              this.grabbers[evt.detail.hand.id] = evt.detail.hand;
+              if (Object.keys(this.grabbers).length === 2) {
+                const hands = Object.values(this.grabbers);
+                this.startTwoHandInteraction(hands[0], hands[1]);
+              }
+            });
+
+            el.addEventListener('released-by', evt => {
+              delete this.grabbers[evt.detail.hand.id];
+              this.isTwoHanded = false;
+            });
+          },
+
+          startTwoHandInteraction(hand1, hand2) {
+            this.isTwoHanded = true;
+
+            const p1 = new THREE.Vector3();
+            const p2 = new THREE.Vector3();
+            hand1.object3D.getWorldPosition(p1);
+            hand2.object3D.getWorldPosition(p2);
+            this.initialDistance = p1.distanceTo(p2);
+
+            this.el.object3D.getWorldScale(this.initialScale);
+            this.initialRotation.copy(this.el.object3D.quaternion);
+          },
+
+          tick() {
+            if (!this.isTwoHanded) return;
+
+            const hands = Object.values(this.grabbers);
+            const [hand1, hand2] = hands;
+
+            const p1 = new THREE.Vector3();
+            const p2 = new THREE.Vector3();
+            hand1.object3D.getWorldPosition(p1);
+            hand2.object3D.getWorldPosition(p2);
+
+            // --- Scale ---
+            const currentDistance = p1.distanceTo(p2);
+            const scaleFactor = currentDistance / this.initialDistance;
+            this.el.object3D.scale.set(
+              this.initialScale.x * scaleFactor,
+              this.initialScale.y * scaleFactor,
+              this.initialScale.z * scaleFactor
+            );
+
+            // --- Rotation ---
+            const dirVec = new THREE.Vector3().subVectors(p2, p1).normalize();
+            const up = new THREE.Vector3(0, 1, 0);
+            const newQuat = new THREE.Quaternion().setFromUnitVectors(up, dirVec);
+
+            this.el.object3D.quaternion.copy(newQuat.multiply(this.initialRotation));
           }
         });
       </script>
