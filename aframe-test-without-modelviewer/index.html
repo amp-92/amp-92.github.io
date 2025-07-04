@@ -59,14 +59,25 @@
             let grabbedEl = null;
 
             controller.addEventListener('triggerdown', () => {
-              const intersection = controller.components.raycaster.getIntersection(document.querySelector('.interactable'));
-              if (intersection) {
-                grabbedEl = intersection.object.el;
-                grabbedEl.emit('grabbed-by', { hand: controller });
+              // Only grab if we're not already holding something
+              if (grabbedEl) return;
+              
+              const intersections = controller.components.raycaster.intersections;
+              if (intersections.length > 0) {
+                // Find the first interactable object
+                for (let i = 0; i < intersections.length; i++) {
+                  const intersection = intersections[i];
+                  if (intersection.object.el && intersection.object.el.classList.contains('interactable')) {
+                    grabbedEl = intersection.object.el;
+                    grabbedEl.emit('grabbed-by', { hand: controller });
+                    break;
+                  }
+                }
               }
             });
 
             controller.addEventListener('triggerup', () => {
+              // Always release if we're holding something
               if (grabbedEl) {
                 grabbedEl.emit('released-by', { hand: controller });
                 grabbedEl = null;
@@ -110,7 +121,7 @@
                 hands[0].object3D.getWorldPosition(p1);
                 hands[1].object3D.getWorldPosition(p2);
 
-                // Detach from single controller
+                // Detach from single controller and attach to scene
                 el.sceneEl.object3D.attach(el.object3D);
 
                 this.initialDistance = p1.distanceTo(p2);
@@ -129,7 +140,9 @@
                 // Reattach to remaining hand
                 this.activeGrabber.object3D.attach(el.object3D);
                 this.isTwoHanded = false;
-              } else {
+              } else if (remainingHands.length === 0) {
+                // No hands left, detach from everything
+                el.sceneEl.object3D.attach(el.object3D);
                 this.activeGrabber = null;
                 this.isTwoHanded = false;
               }
@@ -148,6 +161,10 @@
             const p2 = new THREE.Vector3();
             hand1.object3D.getWorldPosition(p1);
             hand2.object3D.getWorldPosition(p2);
+
+            // --- Position (midpoint between hands) ---
+            const midpoint = new THREE.Vector3().addVectors(p1, p2).multiplyScalar(0.5);
+            this.el.object3D.position.copy(midpoint);
 
             // --- Scaling ---
             const currentDistance = p1.distanceTo(p2);
