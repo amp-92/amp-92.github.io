@@ -96,6 +96,8 @@
             this.initialDistance = 0;
             this.initialScale = new THREE.Vector3();
             this.initialRotation = new THREE.Quaternion();
+            this.initialPosition = new THREE.Vector3();
+            this.initialHandDirection = new THREE.Vector3();
             this.tick = AFRAME.utils.throttleTick(this.tick.bind(this), 20);
 
             const el = this.el;
@@ -121,12 +123,28 @@
                 hands[0].object3D.getWorldPosition(p1);
                 hands[1].object3D.getWorldPosition(p2);
 
+                // Store current world transform before detaching
+                const currentWorldPosition = new THREE.Vector3();
+                const currentWorldQuaternion = new THREE.Quaternion();
+                const currentWorldScale = new THREE.Vector3();
+                el.object3D.getWorldPosition(currentWorldPosition);
+                el.object3D.getWorldQuaternion(currentWorldQuaternion);
+                el.object3D.getWorldScale(currentWorldScale);
+
                 // Detach from single controller and attach to scene
                 el.sceneEl.object3D.attach(el.object3D);
 
+                // Restore world transform
+                el.object3D.position.copy(currentWorldPosition);
+                el.object3D.quaternion.copy(currentWorldQuaternion);
+                el.object3D.scale.copy(currentWorldScale);
+
+                // Store initial two-hand state
                 this.initialDistance = p1.distanceTo(p2);
-                el.object3D.getWorldScale(this.initialScale);
-                this.initialRotation.copy(el.object3D.quaternion);
+                this.initialScale.copy(currentWorldScale);
+                this.initialRotation.copy(currentWorldQuaternion);
+                this.initialPosition.copy(currentWorldPosition);
+                this.initialHandDirection.subVectors(p2, p1).normalize();
               }
             });
 
@@ -137,6 +155,14 @@
               const remainingHands = Object.values(this.grabbers);
               if (remainingHands.length === 1) {
                 this.activeGrabber = remainingHands[0];
+                // Store current world transform before reattaching
+                const currentWorldPosition = new THREE.Vector3();
+                const currentWorldQuaternion = new THREE.Quaternion();
+                const currentWorldScale = new THREE.Vector3();
+                el.object3D.getWorldPosition(currentWorldPosition);
+                el.object3D.getWorldQuaternion(currentWorldQuaternion);
+                el.object3D.getWorldScale(currentWorldScale);
+                
                 // Reattach to remaining hand
                 this.activeGrabber.object3D.attach(el.object3D);
                 this.isTwoHanded = false;
@@ -162,10 +188,6 @@
             hand1.object3D.getWorldPosition(p1);
             hand2.object3D.getWorldPosition(p2);
 
-            // --- Position (midpoint between hands) ---
-            const midpoint = new THREE.Vector3().addVectors(p1, p2).multiplyScalar(0.5);
-            this.el.object3D.position.copy(midpoint);
-
             // --- Scaling ---
             const currentDistance = p1.distanceTo(p2);
             const scaleFactor = currentDistance / this.initialDistance;
@@ -176,10 +198,26 @@
             );
 
             // --- Rotation ---
-            const dirVec = new THREE.Vector3().subVectors(p2, p1).normalize();
-            const up = new THREE.Vector3(0, 1, 0);
-            const newQuat = new THREE.Quaternion().setFromUnitVectors(up, dirVec);
-            this.el.object3D.quaternion.copy(newQuat.multiply(this.initialRotation));
+            const currentHandDirection = new THREE.Vector3().subVectors(p2, p1).normalize();
+            const rotationQuaternion = new THREE.Quaternion().setFromUnitVectors(
+              this.initialHandDirection,
+              currentHandDirection
+            );
+            this.el.object3D.quaternion.copy(this.initialRotation.clone().premultiply(rotationQuaternion));
+
+            // --- Position (maintain relative position to hand midpoint) ---
+            const currentMidpoint = new THREE.Vector3().addVectors(p1, p2).multiplyScalar(0.5);
+            const initialMidpoint = new THREE.Vector3().addVectors(
+              hands[0].object3D.position,
+              hands[1].object3D.position
+            ).multiplyScalar(0.5);
+            
+            // Apply rotation to position offset
+            const positionOffset = new THREE.Vector3().subVectors(this.initialPosition, initialMidpoint);
+            positionOffset.applyQuaternion(rotationQuaternion);
+            positionOffset.multiplyScalar(scaleFactor);
+            
+            this.el.object3D.position.copy(currentMidpoint.add(positionOffset));
           }
         });
       </script>
