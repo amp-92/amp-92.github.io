@@ -8,9 +8,13 @@
   <script src="https://aframe.io/releases/1.7.0/aframe.min.js"></script>
   <script src="https://unpkg.com/aframe-environment-component@1.3.x/dist/aframe-environment-component.min.js"></script>
   <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-extras@7.5.x/dist/aframe-extras.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/aframe-super-hands-component@4.0.5/dist/aframe-super-hands.min.js"></script>
+  <!-- Removed super-hands to use custom grabbable and two-hand-grab code -->
+  <!--<script src="https://cdn.jsdelivr.net/npm/aframe-super-hands-component@4.0.5/dist/aframe-super-hands.min.js"></script>-->
   <script src="https://cdn.jsdelivr.net/npm/aframe-physics-system@4.0.1/dist/aframe-physics-system.min.js"></script>
-  <script src="thumbstick-movement.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/aframe-locomotion@0.2.0/dist/aframe-locomotion.umd.min.js"></script>
+  <script src="simple-navmesh-constraint.js"></script>
+  <!-- Removed custom thumbstick-movement.js to try built-in movement-controls -->
+  <!--<script src="thumbstick-movement.js"></script>-->
   <!-- Removed these components to try and debug movement
   <script src="https://unpkg.com/aframe-terrain-model-component@1.0.1/dist/aframe-terrain-model-component.min.js"></script>
   <script>
@@ -25,15 +29,18 @@
 </head>
 <body>
 
-  <a-scene
-           xr-mode-ui="XRMode: xr"
-  >
+  <a-scene xr-mode-ui="XRMode: xr"
+           obb-collider="showColliders: true">
     <a-assets timeout="10000">
-      <a-asset-item
-                  dynamic-body
-                  id="lfpomolecule"
-                  src="assets/models/LFPO.gltf"
-                  response-type="arraybuffer"
+      <a-asset-item id="lfpomolecule"
+                    src="assets/models/LFPO.gltf"
+                    response-type="arraybuffer"
+                    dynamic-body
+      ></a-asset-item>
+      <a-asset-item id="navmesh"
+                    src="assets/models/room-interior-navmesh.gltf"
+                    response-type="arraybuffer"
+                    dynamic-body
       ></a-asset-item>
       <a-asset-item 
                   static-body
@@ -46,75 +53,68 @@
                     id="lowPolyTerrainModel"
                     src="assets/models/uploads_files_2843601_Terrain+2.glb"
       ></a-asset-item>
+      
       <a-mixin id="all-interactions"
-               hoverable grabbable stretchable draggable
+               hoverable grabbable stretchable draggable two-hand-grab
                event-set__hoveron="_event: hover-start; material.opacity: 0.7; transparent: true"
                event-set__hoveroff="_event: hover-end; material.opacity: 1; transparent: false"
-               dynamic-body
-      ></a-mixin>
-      <a-mixin
-               id="grab-move"
+               dynamic-body>
+      </a-mixin>
+      <!-- Removed some mixins to keep code consistent with working custom grabbers 
+      <a-mixin id="grab-move"
                hoverable grabbable draggable
                event-set__hoveron="_event: hover-start; material.opacity: 0.7; transparent: true"
                event-set__hoveroff="_event: hover-end; material.opacity: 1; transparent: false"
-               dynamic-body
-      ></a-mixin>
-      <a-mixin
-               id="physics-hands"
+               dynamic-body>
+      </a-mixin>
+      <a-mixin id="physics-hands"
                physics-collider phase-shift
                collision-filter="collisionForces: false"
                static-body="shape: sphere; sphereRadius: 0.02"
                super-hands="colliderEvent: collisions;
                             colliderEventProperty: els;
                             colliderEndEvent: collisions;
-                            colliderEndEventProperty: clearedEls;"
-      >
+                            colliderEndEventProperty: clearedEls;">
       </a-mixin>
+      -->
     </a-assets>
-    <a-entity id="rig" position="-1 0 5.4">
-      <a-camera position="0 1.4 0"></a-camera>
+    <a-entity id="rig"
+              position="-1 0 5.4"
+              movement-controls="controls: gamepad,keyboard;" >
+      <a-camera position="0 1.4 0" look-controls="pointerLockEnabled: true" simple-navmesh-constraint="navmesh:.navmesh;fall:0.5;height:1.65;"></a-camera>
       <!-- Adding meta-touch-controls -->
       <a-entity
                 id="left-controller"
-                super-hands
-                sphere-collider="objects: .grabbable"
-      ></a-entity>
-      <a-entity
-                id="right-controller"
-                super-hands
-                sphere-collider="objects: .grabbable"
-      ></a-entity>
-      <!-- Attempt to add super-hands
-      <a-entity sphere-collider="objects: a-box" super-hands hand-controls="hand: left"></a-entity>
-      <a-entity sphere-collider="objects: a-box" super-hands hand-controls="hand: right"></a-entity>
-      -->
-
-      <!-- Attempt to add physics-hands
-      <a-entity
-                id="rhand" mixin="physics-hands"
-                hand-controls="hand: right"
-      >
+                laser-controls="hand: left;"
+                raycaster="objects: .interactable; far: 10"
+                grabber>
       </a-entity>
       <a-entity
-                id="lhand" mixin="physics-hands"
-                hand-controls="hand: left"
-      ></a-entity>
-      -->
+                id="right-controller"
+                laser-controls="hand: right;"
+                raycaster="objects: .interactable; far: 10"
+                grabber>
+      </a-entity>
     </a-entity>
-    <a-entity
+    <a-entity id="home-interior"
               static-body
               gltf-model="#homeinterior"
               position="0 0 0"
+              rotation="0 0 0">
+    </a-entity>
+    <a-entity id="home-navmesh"
+              class="navmesh"
+              gltf-model="#navmesh"
+              position="0 0 0"
               rotation="0 0 0"
-              id="home-interior"
-    ></a-entity>
+              visible="false">
+    </a-entity>
     <a-box static-body width="100" height="0.01" depth="100" visible="false"></a-box>
-    <a-entity
-          dynamic-body
-          class="cube"
-          mixin="cube all-interactions"
-          position="-0.21 0.265 -2.5"
-          material="color: red"
+    <a-entity dynamic-body
+              class="cube"
+              mixin="all-interactions"
+              position="-0.21 0.265 -2.5"
+              material="color: red"
     ></a-entity>
     <a-entity
               gltf-model="#lfpomolecule"
@@ -122,10 +122,181 @@
               rotation="0 90 0"
               scale="0.05 0.05 0.05"
               id="lfpo-molecule"
-              class="grabbable"
+              class="grabbable interactable"
               dynamic-body
+              two-hand-grab
     ></a-entity>
-    <a-entity static-body class="cube" mixin="cube" position="-0.93358 0.40831 4.67315" material="color: red" id="table-collision" scale="2.4 0.8 0.9" visible="false"></a-entity>
+    <a-entity static-body class="cube" position="-0.93358 0.40831 4.67315" material="color: red" id="table-collision" scale="2.4 0.8 0.9" visible="false"></a-entity>
+    <!-- Grabber Component -->
+    <script>
+      AFRAME.registerComponent('grabber', {
+        init: function () {
+          const controller = this.el;
+          let grabbedEl = null;
+
+          controller.addEventListener('triggerdown', () => {
+            // Only grab if we're not already holding something
+            if (grabbedEl) return;
+            
+            const intersections = controller.components.raycaster.intersections;
+            if (intersections.length > 0) {
+              // Find the first interactable object
+              for (let i = 0; i < intersections.length; i++) {
+                const intersection = intersections[i];
+                if (intersection.object.el && intersection.object.el.classList.contains('interactable')) {
+                  grabbedEl = intersection.object.el;
+                  grabbedEl.emit('grabbed-by', { hand: controller });
+                  break;
+                }
+              }
+            }
+          });
+
+          controller.addEventListener('triggerup', () => {
+            // Always release if we're holding something
+            if (grabbedEl) {
+              grabbedEl.emit('released-by', { hand: controller });
+              grabbedEl = null;
+            }
+          });
+        }
+      });
+    </script>
+    <!-- Two-Hand Grab Component -->
+    <script>
+      AFRAME.registerComponent('two-hand-grab', {
+        init: function () {
+          this.grabbers = {};
+          this.isTwoHanded = false;
+          this.activeGrabber = null;
+          this.initialDistance = 0;
+          this.initialScale = new THREE.Vector3();
+          this.initialRotation = new THREE.Quaternion();
+          this.initialPosition = new THREE.Vector3();
+          this.initialHandDirection = new THREE.Vector3();
+          this.tick = AFRAME.utils.throttleTick(this.tick.bind(this), 20);
+
+          const el = this.el;
+
+          el.addEventListener('grabbed-by', evt => {
+            const hand = evt.detail.hand;
+            this.grabbers[hand.id] = hand;
+
+            const grabCount = Object.keys(this.grabbers).length;
+
+            if (grabCount === 1) {
+              this.activeGrabber = hand;
+              // Attach to controller
+              hand.object3D.attach(el.object3D);
+            }
+
+            if (grabCount === 2) {
+              this.isTwoHanded = true;
+
+              const hands = Object.values(this.grabbers);
+              const p1 = new THREE.Vector3();
+              const p2 = new THREE.Vector3();
+              hands[0].object3D.getWorldPosition(p1);
+              hands[1].object3D.getWorldPosition(p2);
+
+              // Store current world transform before detaching
+              const currentWorldPosition = new THREE.Vector3();
+              const currentWorldQuaternion = new THREE.Quaternion();
+              const currentWorldScale = new THREE.Vector3();
+              el.object3D.getWorldPosition(currentWorldPosition);
+              el.object3D.getWorldQuaternion(currentWorldQuaternion);
+              el.object3D.getWorldScale(currentWorldScale);
+
+              // Detach from single controller and attach to scene
+              el.sceneEl.object3D.attach(el.object3D);
+
+              // Restore world transform
+              el.object3D.position.copy(currentWorldPosition);
+              el.object3D.quaternion.copy(currentWorldQuaternion);
+              el.object3D.scale.copy(currentWorldScale);
+
+              // Store initial two-hand state
+              this.initialDistance = p1.distanceTo(p2);
+              this.initialScale.copy(currentWorldScale);
+              this.initialRotation.copy(currentWorldQuaternion);
+              this.initialPosition.copy(currentWorldPosition);
+              this.initialHandDirection.subVectors(p2, p1).normalize();
+            }
+          });
+
+          el.addEventListener('released-by', evt => {
+            const hand = evt.detail.hand;
+            delete this.grabbers[hand.id];
+
+            const remainingHands = Object.values(this.grabbers);
+            if (remainingHands.length === 1) {
+              this.activeGrabber = remainingHands[0];
+              // Store current world transform before reattaching
+              const currentWorldPosition = new THREE.Vector3();
+              const currentWorldQuaternion = new THREE.Quaternion();
+              const currentWorldScale = new THREE.Vector3();
+              el.object3D.getWorldPosition(currentWorldPosition);
+              el.object3D.getWorldQuaternion(currentWorldQuaternion);
+              el.object3D.getWorldScale(currentWorldScale);
+              
+              // Reattach to remaining hand
+              this.activeGrabber.object3D.attach(el.object3D);
+              this.isTwoHanded = false;
+            } else if (remainingHands.length === 0) {
+              // No hands left, detach from everything
+              el.sceneEl.object3D.attach(el.object3D);
+              this.activeGrabber = null;
+              this.isTwoHanded = false;
+            }
+          });
+        },
+
+        tick() {
+          if (!this.isTwoHanded) return;
+
+          const hands = Object.values(this.grabbers);
+          if (hands.length < 2) return;
+
+          const [hand1, hand2] = hands;
+
+          const p1 = new THREE.Vector3();
+          const p2 = new THREE.Vector3();
+          hand1.object3D.getWorldPosition(p1);
+          hand2.object3D.getWorldPosition(p2);
+
+          // --- Scaling ---
+          const currentDistance = p1.distanceTo(p2);
+          const scaleFactor = currentDistance / this.initialDistance;
+          this.el.object3D.scale.set(
+            this.initialScale.x * scaleFactor,
+            this.initialScale.y * scaleFactor,
+            this.initialScale.z * scaleFactor
+          );
+
+          // --- Rotation ---
+          const currentHandDirection = new THREE.Vector3().subVectors(p2, p1).normalize();
+          const rotationQuaternion = new THREE.Quaternion().setFromUnitVectors(
+            this.initialHandDirection,
+            currentHandDirection
+          );
+          this.el.object3D.quaternion.copy(this.initialRotation.clone().premultiply(rotationQuaternion));
+
+          // --- Position (maintain relative position to hand midpoint) ---
+          const currentMidpoint = new THREE.Vector3().addVectors(p1, p2).multiplyScalar(0.5);
+          const initialMidpoint = new THREE.Vector3().addVectors(
+            hands[0].object3D.position,
+            hands[1].object3D.position
+          ).multiplyScalar(0.5);
+          
+          // Apply rotation to position offset
+          const positionOffset = new THREE.Vector3().subVectors(this.initialPosition, initialMidpoint);
+          positionOffset.applyQuaternion(rotationQuaternion);
+          positionOffset.multiplyScalar(scaleFactor);
+          
+          this.el.object3D.position.copy(currentMidpoint.add(positionOffset));
+        }
+      });
+    </script>
   </a-scene>
 </body>
 </html>
