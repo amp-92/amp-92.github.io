@@ -3,9 +3,10 @@
 # To modify the layout, see https://jekyllrb.com/docs/themes/#overriding-theme-defaults
 
 layout: home
+title: "Adam's sandbox site"
 ---
 # Adam's sandbox site
-This should just be a paragraph of text.
+A place to host the web-based things I'm testing out - at the minute, that's mostly A-Frame WebXR scenes.
 
 ## Links to things I'm testing out here
 1. [A-Frame model-viewer development](https://amp-92.github.io/aframe-test)
